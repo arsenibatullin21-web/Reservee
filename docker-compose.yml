@@ -1,7 +1,7 @@
 services:
   web:
     build: .
-    container_name: "Django"
+    container_name: "Django-web"
     ports:
       - "8000:8000"
     volumes:
@@ -23,3 +23,8 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
 
+
+volumes:
+  postgres_data:
+  static:
+  media:

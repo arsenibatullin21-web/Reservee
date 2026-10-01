@@ -39,6 +39,7 @@ BASE_APPS = [
 ]
 
 PROJECT_APPS = [
+    'users.apps.UsersConfig',
 
 ]
 
@@ -132,7 +133,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-MEDIA_URL = 'media'
+MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Email
