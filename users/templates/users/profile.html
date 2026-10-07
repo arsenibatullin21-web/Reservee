@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+
+{% block title %}My profile — Slotly{% endblock %}
+
+{% block extra_css %}
+<style>
+    .profile-page { padding: 48px 0 72px; }
+    .profile-container { max-width: 1100px; }
+    .profile-heading { display: flex; justify-content: space-between; align-items: end; gap: 24px; margin-bottom: 32px; }
+    .profile-heading h1 { margin: 12px 0 10px; font-size: clamp(32px, 4vw, 42px); line-height: 1.15; letter-spacing: -1.5px; }
+    .profile-heading p { margin: 0; color: var(--muted); font-size: 13px; }
+    .profile-layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); align-items: start; gap: 28px; }
+    .profile-sidebar { position: sticky; top: 112px; overflow: hidden; border: 1px solid var(--line); border-radius: 22px; background: var(--surface); }
+    .profile-cover { position: relative; height: 96px; overflow: hidden; background: #eae3f7; }
+    .profile-cover::before, .profile-cover::after { content: ''; position: absolute; width: 180px; height: 180px; border: 1px solid #cfc1e8; border-radius: 50%; }
+    .profile-cover::before { top: -105px; right: -25px; }
+    .profile-cover::after { top: -60px; right: 25px; }
+    .profile-identity { position: relative; padding: 0 24px 24px; text-align: center; }
+    .profile-avatar { position: relative; display: grid; place-items: center; width: 92px; height: 92px; margin: -46px auto 14px; overflow: hidden; border: 5px solid white; border-radius: 50%; background: var(--accent); color: white; font-size: 30px; font-weight: 650; }
+    .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .profile-identity h2 { margin: 0 0 3px; overflow-wrap: anywhere; font-size: 20px; line-height: 1.4; letter-spacing: -.5px; }
+    .profile-handle { margin: 0; color: var(--muted); font-size: 12px; overflow-wrap: anywhere; }
+    .profile-badge { display: inline-flex; align-items: center; gap: 6px; margin-top: 16px; padding: 5px 10px; border-radius: 20px; background: var(--accent-soft); color: var(--accent); font-size: 10px; font-weight: 650; }
+    .profile-badge svg { width: 13px; height: 13px; }
+    .profile-nav { display: grid; gap: 5px; padding: 18px 14px; border-top: 1px solid #eeecf2; }
+    .profile-nav a { display: flex; align-items: center; gap: 11px; padding: 12px 14px; border-radius: 11px; color: #756d83; font-size: 12px; font-weight: 600; transition: color .18s ease, background .18s ease; }
+    .profile-nav a:hover { background: var(--accent-soft); color: var(--accent); }
+    .profile-nav svg { width: 17px; height: 17px; flex-shrink: 0; }
+    .profile-member-since { margin: 0; padding: 16px 20px; border-top: 1px solid #eeecf2; text-align: center; color: #928a9f; font-size: 10px; }
+    .profile-content { display: grid; gap: 20px; min-width: 0; }
+    .profile-card { overflow: hidden; border: 1px solid var(--line); border-radius: 20px; background: var(--surface); }
+    .profile-card-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 24px 28px; border-bottom: 1px solid #eeecf2; }
+    .profile-card-title { display: flex; align-items: center; gap: 12px; }
+    .profile-section-icon { display: grid; place-items: center; flex-shrink: 0; width: 36px; height: 36px; border-radius: 11px; background: #f5f2fc; color: var(--accent); }
+    .profile-section-icon svg { width: 19px; height: 19px; }
+    .profile-card-header h2 { margin: 0; font-size: 15px; letter-spacing: -.2px; }
+    .profile-card-header p { margin: 3px 0 0; color: var(--muted); font-size: 11px; }
+    .profile-data { display: grid; grid-template-columns: 1fr 1fr; gap: 24px 28px; margin: 0; padding: 26px 28px; }
+    .profile-data > div { min-width: 0; }
+    .profile-data dt { margin-bottom: 7px; color: #8b8397; font-size: 11px; }
+    .profile-data dd { margin: 0; color: var(--ink); font-size: 13px; font-weight: 550; overflow-wrap: anywhere; }
+    .profile-data .profile-empty { color: #a49dac; font-weight: 400; }
+    .profile-data-wide { grid-column: 1 / -1; }
+    .profile-account-status { display: inline-flex; align-items: center; gap: 7px; color: #427552; }
+    .profile-account-status::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+    .profile-account-inactive { color: #916c2d; }
+    .profile-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 0 28px 24px; }
+    .profile-actions form { margin: 0; }
+    .profile-actions .button { min-height: 40px; padding: 8px 14px; font-size: 12px; }
+    .profile-updated { margin: 0; padding: 0 28px 24px; color: #948b9f; font-size: 10px; }
+    .profile-note { display: flex; align-items: center; gap: 18px; padding: 23px 26px; border: 1px solid #e4ddf4; border-radius: 18px; background: #eee9f8; }
+    .profile-note > span { color: var(--accent); font-size: 34px; line-height: 1; }
+    .profile-note h2 { margin: 0 0 4px; font-size: 13px; }
+    .profile-note p { margin: 0; color: #7a6e8c; font-size: 12px; }
+    .profile-login-prompt { max-width: 520px; margin: 60px auto; padding: 36px; border: 1px solid var(--line); border-radius: 22px; background: white; text-align: center; }
+    .profile-login-prompt h1 { font-size: 28px; letter-spacing: -.8px; }
+    .profile-login-prompt p { margin-bottom: 24px; color: var(--muted); font-size: 14px; }
+    @media (max-width: 900px) {
+        .profile-layout { grid-template-columns: 240px minmax(0, 1fr); gap: 20px; }
+        .profile-card-header, .profile-data { padding: 22px; }
+        .profile-data { gap: 22px 18px; }
+    }
+    @media (max-width: 760px) {
+        .profile-page { padding-block: 32px 48px; }
+        .profile-heading { align-items: start; flex-direction: column; gap: 16px; }
+        .profile-layout { grid-template-columns: 1fr; }
+        .profile-sidebar { position: static; }
+        .profile-nav { grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 12px; }
+        .profile-nav a { flex-direction: column; justify-content: center; gap: 6px; padding: 10px 4px; font-size: 10px; text-align: center; }
+        .profile-cover { height: 88px; }
+        .profile-identity { padding-bottom: 20px; }
+    }
+    @media (max-width: 420px) {
+        .profile-data { grid-template-columns: 1fr; }
+        .profile-note { padding: 20px; gap: 13px; }
+        .profile-card-header { padding: 20px; }
+        .profile-card-header p { max-width: 190px; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="profile-page">
+    <div class="container profile-container">
+        {% if user.is_authenticated %}
+            {% url 'users:profile-edit' as profile_edit_url %}
+            {% url 'users:password-change' as profile_password_url %}
+            {% url 'users:logout' as profile_logout_url %}
+            <div class="profile-heading">
+                <div>
+                    <span class="eyebrow">Your little corner of Slotly</span>
+                    <h1>My profile<span class="brand-dot">.</span></h1>
+                    <p>Your details, all in one place. Just the way it should be.</p>
+                </div>
+                {% if profile_edit_url %}<a class="button button-quiet" href="{{ profile_edit_url }}">Edit profile <span aria-hidden="true">↗</span></a>{% endif %}
+            </div>
+
+            <div class="profile-layout">
+                <aside class="profile-sidebar" aria-label="Your profile overview">
+                    <div class="profile-cover" aria-hidden="true"></div>
+                    <div class="profile-identity">
+                        <div class="profile-avatar">
+                            {% if user.avatar %}
+                                <img src="{{ user.avatar.url }}" alt="{{ user.get_full_name|default:user.username }}'s profile photo">
+                            {% else %}
+                                <span aria-hidden="true">{% if user.first_name %}{{ user.first_name|slice:':1'|upper }}{{ user.last_name|slice:':1'|upper }}{% else %}{{ user.username|slice:':1'|upper }}{% endif %}</span>
+                            {% endif %}
+                        </div>
+                        <h2>{{ user.get_full_name|default:user.username }}</h2>
+                        <p class="profile-handle">@{{ user.username }}</p>
+                        <span class="profile-badge"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="m10 2 2.4 4.8 5.3.8-3.9 3.8.9 5.3-4.7-2.5-4.7 2.5.9-5.3L2.3 7.6l5.3-.8L10 2Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>{% if user.is_staff %}Slotly team{% else %}Slotly member{% endif %}</span>
+                    </div>
+                    <nav class="profile-nav" aria-label="Profile sections">
+                        <a href="#personal-details"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="8" r="3.5" stroke="currentColor" stroke-width="1.6"/><path d="M5 21v-2a7 7 0 0 1 14 0v2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Personal details</a>
+                        <a href="#profile-location"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 1 1 14 0Z" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="10" r="2.5" stroke="currentColor" stroke-width="1.6"/></svg>Location</a>
+                        <a href="#profile-account"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m12 3 8 3v6c0 5-8 9-8 9s-8-4-8-9V6l8-3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="m8 12 3 3 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Account</a>
+                    </nav>
+                    <p class="profile-member-since">Member since {{ user.date_joined|date:'F Y' }}</p>
+                </aside>
+
+                <div class="profile-content">
+                    <section class="profile-card" id="personal-details" aria-labelledby="personal-details-heading">
+                        <div class="profile-card-header">
+                            <div class="profile-card-title">
+                                <span class="profile-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.5" stroke="currentColor" stroke-width="1.6"/><path d="M5 21v-2a7 7 0 0 1 14 0v2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span>
+                                <div><h2 id="personal-details-heading">Personal details</h2><p>The essentials that make this account yours.</p></div>
+                            </div>
+                        </div>
+                        <dl class="profile-data">
+                            <div><dt>First name</dt><dd>{% if user.first_name %}{{ user.first_name }}{% else %}<span class="profile-empty">Not provided</span>{% endif %}</dd></div>
+                            <div><dt>Last name</dt><dd>{% if user.last_name %}{{ user.last_name }}{% else %}<span class="profile-empty">Not provided</span>{% endif %}</dd></div>
+                            <div><dt>Email address</dt><dd>{% if user.email %}{{ user.email }}{% else %}<span class="profile-empty">Not provided</span>{% endif %}</dd></div>
+                            <div><dt>Phone number</dt><dd>{% if user.phone %}{{ user.phone }}{% else %}<span class="profile-empty">Not provided</span>{% endif %}</dd></div>
+                        </dl>
+                    </section>
+
+                    <section class="profile-card" id="profile-location" aria-labelledby="profile-location-heading">
+                        <div class="profile-card-header">
+                            <div class="profile-card-title">
+                                <span class="profile-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 1 1 14 0Z" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="10" r="2.5" stroke="currentColor" stroke-width="1.6"/></svg></span>
+                                <div><h2 id="profile-location-heading">Location</h2><p>Your saved city and address.</p></div>
+                            </div>
+                        </div>
+                        <dl class="profile-data">
+                            <div><dt>City</dt><dd>{% if user.city %}{{ user.city }}{% else %}<span class="profile-empty">Not provided</span>{% endif %}</dd></div>
+                            <div><dt>Address</dt><dd>{% if user.address %}{{ user.address }}{% else %}<span class="profile-empty">Not provided</span>{% endif %}</dd></div>
+                        </dl>
+                    </section>
+
+                    <section class="profile-card" id="profile-account" aria-labelledby="profile-account-heading">
+                        <div class="profile-card-header">
+                            <div class="profile-card-title">
+                                <span class="profile-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="m12 3 8 3v6c0 5-8 9-8 9s-8-4-8-9V6l8-3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="m8 12 3 3 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                                <div><h2 id="profile-account-heading">Account information</h2><p>A few things about your Slotly account.</p></div>
+                            </div>
+                        </div>
+                        <dl class="profile-data">
+                            <div><dt>Username</dt><dd>{{ user.username }}</dd></div>
+                            <div><dt>Joined Slotly</dt><dd>{{ user.date_joined|date:'F j, Y' }}</dd></div>
+                            <div><dt>Account status</dt><dd><span class="profile-account-status {% if not user.is_active %}profile-account-inactive{% endif %}">{% if user.is_active %}Active{% else %}Inactive{% endif %}</span></dd></div>
+                            <div><dt>Role</dt><dd>{% if user.is_staff %}Staff{% else %}Member{% endif %}</dd></div>
+                        </dl>
+                        {% if profile_password_url or profile_logout_url %}
+                            <div class="profile-actions">
+                                {% if profile_password_url %}<a class="button button-quiet" href="{{ profile_password_url }}">Change password</a>{% endif %}
+                                {% if profile_logout_url %}<form method="post" action="{{ profile_logout_url }}">{% csrf_token %}<button type="submit" class="button button-quiet">Log out <span aria-hidden="true">↗</span></button></form>{% endif %}
+                            </div>
+                        {% endif %}
+                        {% if user.updated_at %}<p class="profile-updated">Last updated {{ user.updated_at|date:'F j, Y' }}</p>{% endif %}
+                    </section>
+
+                    <aside class="profile-note"><span aria-hidden="true">✳</span><div><h2>A little less planning. A little more living.</h2><p>Make room for the people, places, and moments you love.</p></div></aside>
+                </div>
+            </div>
+        {% else %}
+            <div class="profile-login-prompt">
+                <span class="eyebrow">Your space is waiting</span>
+                <h1>Log in to see your profile</h1>
+                <p>Your account details are available after you sign in.</p>
+                {% url 'users:login' as profile_login_url %}
+                {% if profile_login_url %}<a class="button button-primary" href="{{ profile_login_url }}{% if request.path %}?next={{ request.path|urlencode }}{% endif %}">Log in <span aria-hidden="true">↗</span></a>{% endif %}
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
