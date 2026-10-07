@@ -18,7 +18,6 @@ class UserLoginView(LoginView):
     model = get_user_model()
     form_class = UserLoginForm
     template_name = 'users/login.html'
-    success_url = reverse_lazy('users:profile')
 
 
 class UserProfileView(DetailView):

@@ -154,3 +154,5 @@ if not DEBUG:
     CSRF_COOKIE_SECURE = True
 
 AUTH_USER_MODEL = 'users.User'
+LOGIN_URL = 'users:login'
+LOGIN_REDIRECT_URL = 'users:profile'
